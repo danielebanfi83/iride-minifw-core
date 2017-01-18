@@ -66,7 +66,7 @@ function isIntero($n)
 		return false;
 }
 
-//data un array associativo, lo scrive a schermo con XML. Prima di scriverlo pulisce il buffer dell schermo
+//data un array associativo, lo scrive a schermo con XML
 function generaXML($OUT)
 {
     $doc = new DOMDocument("1.0", "UTF-8");
@@ -252,29 +252,12 @@ function elencadir($dir,$array,$exclude_dirs=array()){
 }
 
 function iwautoload($class_name) {
-    $ar_classes = explode("\\",$class_name);
-    $class_name = $ar_classes[count($ar_classes)-1];
-    //include("/Users/Daniele/Documents/Iride/irideweb2/classi/core/".$class_name.".php");
-    $exclude_dirs = array("", ".", "..","third-party");
-    $ar=array();
-    $fromCache = array_key_exists("dirList", $GLOBALS) ? $GLOBALS["dirList"] : null;
-    if(is_null($fromCache)) {
-        $ar_dir=elencadir(__DIR__."/../../../src",$ar,$exclude_dirs);
-        $GLOBALS["dirList"] = $ar_dir;
+    $path_to = explode("\\",$class_name);
+    $path = "";
+    for($i = 0; $i < count($path_to) - 1; $i++){
+        $path .= $path_to[$i]."/";
     }
-    else $ar_dir = $fromCache;
-    foreach($ar_dir as $dir){
-        if(!file_exists($dir."/".$class_name.".php")) continue;
-
-        include_once($dir."/".$class_name.".php");
-        if(IWCache::have($class_name."_namespace")) break;
-
-        $content = file_get_contents($dir."/".$class_name.".php");
-        $fullyQ = getNameSpaceFromContent($content);
-        IWCache::set($class_name."_namespace", $fullyQ, 604800);
-
-        break;
-    }
+    include_once(__DIR__."/../../../src/".$path.$path_to[count($path_to) - 1].".php");
 }
 
 function getNameSpaceFromContent($content){
@@ -286,7 +269,7 @@ function getNameSpaceFromContent($content){
 function getNameSpace($classname){
     if(IWCache::get($classname."_namespace") != "") return IWCache::get($classname."_namespace");
     $ar = [];
-    $exclude_dirs = array("", ".", "..","third-party");
+    $exclude_dirs = array("", ".", "..");
     $ar_dir=elencadir(__DIR__."/../../src",$ar,$exclude_dirs);
     $content = "";
     foreach ($ar_dir as $dir) {
@@ -298,12 +281,6 @@ function getNameSpace($classname){
     $fullyQ = getNameSpaceFromContent($content);
     IWCache::set($classname."_namespace", $fullyQ, 604800);
     return $fullyQ;
-}
-
-function getCurrentClass($class){
-    $path = explode("\\",$class);
-    $c = count($path) - 1;
-    return $path[$c];
 }
 
 function IWSelect(){

@@ -8,6 +8,7 @@
 
 namespace IrideWeb\Twig;
 
+use IrideWeb\Core\Date;
 use Slim\Views\TwigExtension;
 use Twig_SimpleFunction;
 

@@ -114,8 +114,7 @@ abstract class IWController
 
         $this->modules = [];
         foreach ($this->parameters["modules"] as $module) {
-            $class = $module["name"]."\\".$module["name"];
-            $this->modules[] = new $class();
+            $this->modules[] = $module["name"];
         }
 
         $db_params = $this->parameters["db_parameters"];

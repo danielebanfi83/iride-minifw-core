@@ -6,7 +6,7 @@
  * Time: 11:12
  */
 
-namespace IrideWeb\IrideWeb\Core;
+namespace IrideWeb\Core;
 
 
 use IrideWeb\Database\IWDb;
@@ -42,7 +42,6 @@ abstract class IWCommand
             die();
         }
         
-        $obj = getNameSpace($obj)."\\".$obj;
         $obj = new $obj();
         if(!($obj instanceof IWCommand)) {
             echo "Command not found";

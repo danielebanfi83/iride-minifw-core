@@ -226,11 +226,7 @@ class IWDb{
         $namespaces = [];
         foreach ($entities as $entity) {
             $dbTable = "";
-            /**
-             * @var $module IWModule
-             */
-            foreach ($this->modules as $module) {
-                $namespace = (new \ReflectionObject($module))->getNamespaceName();
+            foreach ($this->modules as $namespace) {
                 if(!class_exists($namespace."\\Entities\\".$entity)) continue;
 
                 $dbTable = $namespace."\\Entities\\".$entity;
