@@ -8,7 +8,7 @@
 
 namespace IrideWeb\Database;
 
-use IrideWeb\Core\Cache\IWCache;
+use IrideWeb\Cache\IWCache;
 use IrideWeb\Core\IWGlobal;
 
 abstract class DBTable implements \Iterator {

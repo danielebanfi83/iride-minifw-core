@@ -5,7 +5,7 @@ namespace IrideWeb\Core;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use IrideWeb\Core\Cache\IWCache;
+use IrideWeb\Cache\IWCache;
 
 class Date
 {
