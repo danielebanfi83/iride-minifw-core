@@ -11,7 +11,7 @@ namespace IrideWeb\Core;
 
 use IrideWeb\Database\IWDb;
 use IrideWeb\Database\IWUsersInterface;
-use IrideWeb\IrideWeb\Core\IWNoAccess;
+//use IrideWeb\IrideWeb\Core\IWNoAccess;
 use Slim\Http\Response;
 use Twig_Environment;
 
@@ -53,13 +53,18 @@ abstract class IWController
     protected $role;
 
     /**
+     * @var array
+     */
+    protected $modules;
+
+    /**
      * Internal Parameters loaded by parametri.yml
      * @var array
      */
     protected $parameters;
     
     public static function factory($object, $twig, $psrVars, $args, $role, $session){
-        $index = "IrideWeb\\IrideWeb\\Controllers\\IWIndex";
+        $index = "AppModule\\Controllers\\IWIndex";
         if($object == "") $object = $index;
         if(!class_exists($object)) $object = $index;
 
@@ -75,12 +80,12 @@ abstract class IWController
         $object->setParameters();
         $object->setArgs($args);
         $perm = $object->checkPermission($role);
-        if(!$perm) {
+        /*if(!$perm) {
             $object = new IWNoAccess();
             $object->setSession($session);
             $object->setParameters();
             $object->setArgs($args);
-        }
+        }*/
 
         $object->setTwig($twig);
         $object->setRequest($psrVars[0]);
@@ -106,9 +111,17 @@ abstract class IWController
     public function setParameters(){
         $this->parameters = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/config.yml");
         IWGlobal::set("config", $this->parameters);
+
+        $this->modules = [];
+        foreach ($this->parameters["modules"] as $module) {
+            $class = $module["name"]."\\".$module["name"];
+            $this->modules[] = new $class();
+        }
+
         $db_params = $this->parameters["db_parameters"];
         $this->iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
         $this->session->set("db",$db_params["dbname"]);
+        $this->iwdb->setModules($this->modules);
         $this->iwdb->setSession($this->session);
         $this->iwdb->DBOpen();
         IWGlobal::setDbInstance($this->iwdb);

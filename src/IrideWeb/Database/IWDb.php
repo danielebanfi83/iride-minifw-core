@@ -3,6 +3,7 @@ namespace IrideWeb\Database;
 
 use IrideWeb\Cache\IWCache;
 use IrideWeb\Core\IWGlobal;
+use IrideWeb\Core\IWModule;
 use PDO;
 use PDOStatement;
 use PDOException;
@@ -21,6 +22,11 @@ class IWDb{
 	 * @var PDO
 	 */
 	private $pdo;
+
+    /**
+     * @var array
+     */
+    private $modules;
 
 	public function __construct($host="",$user="",$pwd="")
 	{
@@ -219,7 +225,18 @@ class IWDb{
         $columns = [];
         $namespaces = [];
         foreach ($entities as $entity) {
-            $dbTable = getNameSpace($entity)."\\".$entity;
+            $dbTable = "";
+            /**
+             * @var $module IWModule
+             */
+            foreach ($this->modules as $module) {
+                $namespace = (new \ReflectionObject($module))->getNamespaceName();
+                if(!class_exists($namespace."\\Entities\\".$entity)) continue;
+
+                $dbTable = $namespace."\\Entities\\".$entity;
+                break;
+            }
+            //$dbTable = getNameSpace($entity)."\\".$entity;
             $namespaces[$entity] = $dbTable;
             /**
              * @var $dbTable DBTable
@@ -504,6 +521,25 @@ class IWDb{
     public function setSession($session)
     {
         $this->session = $session;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getModules()
+    {
+        return $this->modules;
+    }
+
+    /**
+     * @param array $modules
+     * @return IWDb
+     */
+    public function setModules($modules)
+    {
+        $this->modules = $modules;
 
         return $this;
     }
