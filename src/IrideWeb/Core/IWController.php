@@ -9,9 +9,10 @@
 namespace IrideWeb\Core;
 
 
+use IrideWeb\Controllers\IWIndex;
+use IrideWeb\Controllers\IWNoAccess;
 use IrideWeb\Database\IWDb;
 use IrideWeb\Database\IWUsersInterface;
-//use IrideWeb\IrideWeb\Core\IWNoAccess;
 use Slim\Http\Response;
 use Twig_Environment;
 
@@ -63,41 +64,41 @@ abstract class IWController
      */
     protected $parameters;
     
-    public static function factory($object, $twig, $psrVars, $args, $role, $session){
-        $index = "AppModule\\Controllers\\IWIndex";
-        if($object == "") $object = $index;
-        if(!class_exists($object)) $object = $index;
+    public static function factory($object){
+        $parameters = IWGlobal::get("config");
+        if(!array_key_exists("factory", $parameters)) $index = new IWIndex();
+        elseif(!array_key_exists("index", $parameters["factory"])) $index = new IWIndex();
+        else{
+            $index = $parameters["factory"]["index"];
+            $index = new $index();
+        }
+
+        if($object == "") return $index;
+        if(!class_exists($object)) return $index;
 
         /**
          * @var $object IWController
          */
         $object = new $object();
 
-        if(!$object instanceof IWController)
-            $object = new $index();
-
-        $object->setSession($session);
-        $object->setParameters();
-        $object->setArgs($args);
-        $perm = $object->checkPermission($role);
-        /*if(!$perm) {
-            $object = new IWNoAccess();
-            $object->setSession($session);
-            $object->setParameters();
-            $object->setArgs($args);
-        }*/
-
-        $object->setTwig($twig);
-        $object->setRequest($psrVars[0]);
-        $object->setResponse($psrVars[1]);
-        $object->setResponseFormat();
-        $object->setRole($role);
+        if(!$object instanceof IWController) return $index;
 
         return $object;
     }
 
-    private function setResponseFormat(){
-        $this->responseFormat = $this->getResponseFormat();
+    /**
+     * @return IWController
+     */
+    public function noAccessFactory(){
+        if(!array_key_exists("factory", $this->parameters)) return new IWNoAccess();
+
+        if(!array_key_exists("no_access", $this->parameters["factory"])) return new IWNoAccess();
+
+        $no_access = $this->parameters["factory"]["no_access"];
+        $no_access = new $no_access();
+        if(!($no_access instanceof IWController)) return new IWNoAccess();
+
+        return $no_access;
     }
 
     public function getResponseFormat(){
@@ -108,9 +109,8 @@ abstract class IWController
         return "";
     }
     
-    public function setParameters(){
-        $this->parameters = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/config.yml");
-        IWGlobal::set("config", $this->parameters);
+    public function setParameters($parameters){
+        $this->parameters = $parameters;
 
         $this->modules = [];
         foreach ($this->parameters["modules"] as $module) {
@@ -128,6 +128,8 @@ abstract class IWController
         $pwds = $this->parameters["pwd_passepartout"];
         IWGlobal::set("pwd1", $pwds["pwd1"]);
         IWGlobal::set("pwd2", $pwds["pwd2"]);
+
+        return $this;
     }
     
     public function getDb(){
@@ -137,7 +139,10 @@ abstract class IWController
     public function checkPermission($role){
         if($role == "anon") return true;
 
-        $usersClass = $this->parameters["db_parameters"]["users_class"];
+        if(!array_key_exists("factory", $this->parameters)) return false;
+        if(!array_key_exists("users", $this->parameters["factory"])) return false;
+
+        $usersClass = $this->parameters["factory"]["users"];
         /**
          * @var $user IWUsersInterface
          */
@@ -167,6 +172,7 @@ abstract class IWController
     }
     
     public function run(){
+        $this->responseFormat = $this->getResponseFormat();
         if(intval($this->request->getParsedBody()["OP_FROM_AJAX"]) == 1) $this->responseFormat = "json";
         switch($this->responseFormat){
             case "json" :
@@ -340,5 +346,13 @@ abstract class IWController
         $this->session = $session;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 }
