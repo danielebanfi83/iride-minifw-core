@@ -6,7 +6,7 @@
  * Time: 14:58
  */
 
-namespace IrideWeb\Core\IWPdfExcel;
+namespace IrideWeb\IWPdfExcel;
 
 
 interface IWPdfExcelInterface

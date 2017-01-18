@@ -1,6 +1,6 @@
 <?php
 
-namespace IrideWeb\Core\Cache;
+namespace IrideWeb\Cache;
 
 /**
  * Created by Iride Staff.

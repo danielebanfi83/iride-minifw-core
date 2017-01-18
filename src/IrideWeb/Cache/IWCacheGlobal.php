@@ -1,5 +1,5 @@
 <?php
-namespace IrideWeb\Core\Cache;
+namespace IrideWeb\Cache;
 
 use IrideWeb\Core\IWGlobal;
 

@@ -6,7 +6,7 @@
  * Time: 14:39
  */
 
-namespace IrideWeb\Core\IWPdfExcel;
+namespace IrideWeb\IWPdfExcel;
 
 
 use PHPExcel;

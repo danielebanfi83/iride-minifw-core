@@ -1,8 +1,6 @@
 <?php
 
-namespace IrideWeb\Core\Cache;
-
-use IrideWeb\Core\IWGlobal;
+namespace IrideWeb\Cache;
 
 /**
  * Created by Iride Staff.
@@ -17,7 +15,7 @@ class IWCache{
     private $tipoCache;
 
     public function __construct(){
-        $tipoCache = "";//IWGlobal::get("tipo_cache");
+        $tipoCache = "";
         switch($tipoCache){
             case "XCache" : $this->tipoCache = new IWCacheXCache(); break;
             case "ZendCache" : $this->tipoCache = new IWCacheZend(); break;
