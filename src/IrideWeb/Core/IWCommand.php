@@ -22,14 +22,14 @@ abstract class IWCommand
     
     public static function run($args){
 
-        $parameters = \Spyc::YAMLLoad(__DIR__."/../../../../config/config.yml");
+        $parameters = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/config.yml");
         $db_params = $parameters["db_parameters"];
         //print_r($db_params);die();
         $iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
         IWGlobal::setDbInstance($iwdb);
         
         $my_command = $args[0];
-        $commands_list = \Spyc::YAMLLoad(__DIR__."/../../../../config/commands.yml");
+        $commands_list = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/commands.yml");
         $obj = "";
         foreach ($commands_list["commands"] as $command) {
             if($command["name"] != $my_command) continue; 

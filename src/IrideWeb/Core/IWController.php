@@ -12,7 +12,6 @@ namespace IrideWeb\Core;
 use IrideWeb\Database\IWDb;
 use IrideWeb\Database\IWUsersInterface;
 use IrideWeb\IrideWeb\Core\IWNoAccess;
-use IrideWeb\IWDb\Entities\UsersTable;
 use Slim\Http\Response;
 use Twig_Environment;
 
@@ -105,7 +104,7 @@ abstract class IWController
     }
     
     public function setParameters(){
-        $this->parameters = \Spyc::YAMLLoad(__DIR__."/../../../../config/config.yml");
+        $this->parameters = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/config.yml");
         IWGlobal::set("config", $this->parameters);
         $db_params = $this->parameters["db_parameters"];
         $this->iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
