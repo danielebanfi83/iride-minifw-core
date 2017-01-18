@@ -2,7 +2,7 @@
 
 
 //funzione che carica un altra pagina con l'aggiunta opzionale di stringhe all'url
-use IrideWeb\Core\Cache\IWCache;
+use IrideWeb\Cache\IWCache;
 use IrideWeb\Core\IWGlobal;
 use IrideWeb\Database\IWQuery;
 
