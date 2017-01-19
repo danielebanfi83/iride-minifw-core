@@ -14,6 +14,7 @@ use Twig_SimpleFunction;
 
 class IrideTwigExtension extends TwigExtension
 {
+    protected $environment;
 
     /**
      * Returns the name of the extension.
@@ -34,6 +35,7 @@ class IrideTwigExtension extends TwigExtension
             new Twig_SimpleFunction("toEuro", function($number, $decimals = 2, $se_zero_stringa_vuota = false){ return toEuro($number, $decimals, $se_zero_stringa_vuota); }),
             new Twig_SimpleFunction("date_it", function($data){ return Date::it($data); }),
             new Twig_SimpleFunction("getCsrfForm", [$this, "getCsrfForm"],["is_safe" => ["all"], "needs_environment" => true]),
+            new Twig_SimpleFunction("path",[$this, "path"])
         ];
         
         return array_merge($func, $func_iride);
@@ -47,5 +49,27 @@ class IrideTwigExtension extends TwigExtension
             "csrfValue" => $csrfValue
         ]);
     }
-    
+
+    public function path($route){
+        return $this->environment == "dev" ? "/dev.php".$route : $route;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEnvironment()
+    {
+        return $this->environment;
+    }
+
+    /**
+     * @param mixed $environment
+     * @return IrideTwigExtension
+     */
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+
+        return $this;
+    }
 }

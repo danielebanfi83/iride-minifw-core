@@ -13,6 +13,7 @@ use IrideWeb\Controllers\IWIndex;
 use IrideWeb\Controllers\IWNoAccess;
 use IrideWeb\Database\IWDb;
 use IrideWeb\Database\IWUsersInterface;
+use IrideWeb\Twig\IrideTwigExtension;
 use Slim\Http\Response;
 use Twig_Environment;
 
@@ -218,6 +219,15 @@ abstract class IWController
             $OUT["ret"] = false;
         
         return $OUT;
+    }
+
+    public function path($route){
+        $twig_env = $this->twig->getEnvironment();
+        /**
+         * @var $irideTwig IrideTwigExtension
+         */
+        $irideTwig = $twig_env->getExtension("IrideTwigExtension");
+        return $irideTwig->path($route);
     }
 
     /**

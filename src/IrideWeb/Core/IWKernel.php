@@ -32,25 +32,29 @@ class IWKernel
 
     protected $settings;
 
+    private $environment;
+
     public function __construct($parameters)
     {
         $this->parameters = $parameters;
     }
 
     public function setDependencies(){
-        $this->container['view'] = function ($container) {
+        $env = $this->environment;
+        $this->container['view'] = function ($container) use ($env) {
+            $settings = $env == "prod" ? ["cache" => __DIR__."/../../../../../../templates/cache"] : [];
             $view = new Twig(
-                __DIR__."/../../../../../../templates", [
-                'cache' =>  __DIR__."/../../../../../../templates/cache"
-            ]);
+                __DIR__."/../../../../../../templates",$settings);
             $view->addExtension(new TwigExtension(
                 $container['router'],
                 $container['request']->getUri()
             ));
-            $view->addExtension(new IrideTwigExtension(
+            $iride_twig = new IrideTwigExtension(
                 $container["router"],
                 $container["request"]->getUri()
-            ));
+            );
+            $iride_twig->setEnvironment($env);
+            $view->addExtension($iride_twig);
 
             return $view;
         };
@@ -129,12 +133,13 @@ class IWKernel
     public function getSettings(){
         return [
             'settings' => [
-                'displayErrorDetails' => true, // set to false in production
+                'displayErrorDetails' => $this->environment == "dev", // false in production, true in testing
             ],
         ];
     }
 
-    public function dispatch(){
+    public function dispatch($environment){
+        $this->environment = $environment;
         $this->app = new App($this->getSettings());
         $this->container = $this->app->getContainer();
         $this->setDependencies();
