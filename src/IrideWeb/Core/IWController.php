@@ -69,6 +69,11 @@ abstract class IWController
      * @var IWTranslator
      */
     protected $translator;
+
+    /**
+     * @var IWUsersInterface
+     */
+    protected $user;
     
     public static function factory($object){
         $parameters = IWGlobal::get("config");
@@ -156,28 +161,26 @@ abstract class IWController
         if(!array_key_exists("users", $this->parameters["factory"])) return false;
 
         $usersClass = $this->parameters["factory"]["users"];
-        /**
-         * @var $user IWUsersInterface
-         */
-        $user = new $usersClass($this->session->get("userLogged"));
-        if(!($user instanceof IWUsersInterface)) return false;
+
+        $this->user = new $usersClass($this->session->get("userLogged"));
+        if(!($this->user instanceof IWUsersInterface)) return false;
 
         $perms = [
-            "is_admin" => $user->getAdmin() == 1 ? true : false,
-            "is_superadmin" => $user->getSuperadmin() == 1 ? true : false,
-            "is_supersuperadmin" => $user->getSuperSuperadmin() == 1 ? true : false
+            "is_admin" => $this->user->getAdmin() == 1 ? true : false,
+            "is_superadmin" => $this->user->getSuperadmin() == 1 ? true : false,
+            "is_supersuperadmin" => $this->user->getSuperSuperadmin() == 1 ? true : false
         ];
         $this->args = array_merge($this->args, $perms);
-        if($user->getId() == 0) return false;
+        if($this->user->getId() == 0) return false;
 
-        IWGlobal::setUser($user);
-        if($user->getSuperSuperadmin() == 1) return true;
+        IWGlobal::setUser($this->user);
+        if($this->user->getSuperSuperadmin() == 1) return true;
 
         $perm = 1;
         if($role == "admin") $perm = 11;
         if($role == "superadmin") $perm = 111;
 
-        $user_perm = intval(intval($user->getSuperadmin()).intval($user->getAdmin())."1");
+        $user_perm = intval(intval($this->user->getSuperadmin()).intval($this->user->getAdmin())."1");
 
         if($user_perm >= $perm) return true;
 
@@ -185,6 +188,11 @@ abstract class IWController
     }
     
     public function run(){
+        if($this->user !== null){
+            $this->translator->setLang($this->user->getLang());
+            $this->twig->getEnvironment()->getExtension("iride_extensions")->setTranslator($this->translator);
+        }
+
         $this->responseFormat = $this->getResponseFormat();
         if(intval($this->request->getParsedBody()["OP_FROM_AJAX"]) == 1) $this->responseFormat = "json";
         switch($this->responseFormat){
@@ -238,7 +246,7 @@ abstract class IWController
         /**
          * @var $irideTwig IrideTwigExtension
          */
-        $irideTwig = $twig_env->getExtension("IrideTwigExtension");
+        $irideTwig = $twig_env->getExtension("iride_extensions");
         return $irideTwig->path($route);
     }
 

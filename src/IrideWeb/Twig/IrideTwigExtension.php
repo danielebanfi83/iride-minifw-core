@@ -35,13 +35,14 @@ class IrideTwigExtension extends TwigExtension
     public function getFunctions()
     {
         $func = parent::getFunctions();
+        $translator = $this->translator;
         $func_iride = [
             new Twig_SimpleFunction("getmicrotime",function(){ return getmicrotime(); }),
             new Twig_SimpleFunction("toEuro", function($number, $decimals = 2, $se_zero_stringa_vuota = false){ return toEuro($number, $decimals, $se_zero_stringa_vuota); }),
             new Twig_SimpleFunction("date_it", function($data){ return Date::it($data); }),
             new Twig_SimpleFunction("getCsrfForm", [$this, "getCsrfForm"],["is_safe" => ["all"], "needs_environment" => true]),
             new Twig_SimpleFunction("path",[$this, "path"]),
-            new Twig_SimpleFunction("trans",[$this, "trans"], ["needs_environment" => true])
+            new Twig_SimpleFunction("trans",function($key) use ($translator){ return $translator->trans($key);})
         ];
         
         return array_merge($func, $func_iride);

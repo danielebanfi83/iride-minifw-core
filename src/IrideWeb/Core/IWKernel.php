@@ -11,7 +11,9 @@ namespace IrideWeb\Core;
 
 use Interop\Container\ContainerInterface;
 use IrideWeb\Database\IWDb;
+use IrideWeb\Database\IWQuery;
 use IrideWeb\Twig\IrideTwigExtension;
+use MultilingualSlim\LanguageMiddleware;
 use Slim\App;
 use Slim\Csrf\Guard;
 use Slim\Views\Twig;
@@ -70,11 +72,11 @@ class IWKernel
 
         $db_params = $this->parameters["db_parameters"];
         $this->iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
+        $this->iwdb->setDb($db_params["dbname"]);
+        $this->iwdb->DBOpen();
+        IWGlobal::setDbInstance($this->iwdb);
         $iwdb = $this->iwdb;
-        $this->container["db"] = function () use ($db_params, $iwdb){
-            $iwdb->setDb($db_params["db_name"]);
-            $iwdb->DBOpen();
-            IWGlobal::setDbInstance($iwdb);
+        $this->container["db"] = function () use ($iwdb){
             return $iwdb;
         };
 
@@ -129,7 +131,8 @@ class IWKernel
             $obj = array_key_exists("obj", $route) ? $route["obj"] : "";
             $method = $route["method"];
             $parameters = $this->parameters;
-            $this->app->$method($route["path"], function ($request, $response, $args) use ($role, $obj, $parameters){
+            $iwdb = $this->iwdb;
+            $this->app->$method($route["path"], function ($request, $response, $args) use ($role, $obj, $parameters, $iwdb){
                 $csrf = [
                     "csrfNameKey" => $this->csrf->getTokenNameKey(),
                     "csrfValueKey" => $this->csrf->getTokenValueKey(),
@@ -141,20 +144,20 @@ class IWKernel
                 $obj = IWController::factory($obj);
                 $obj->setSession($this->helper)
                     ->setParameters($parameters)
-                    ->setIwdb($this->db)
+                    ->setIwdb($iwdb)
                     ->setArgs($args);
 
                 if(!$obj->checkPermission($role)) {
                     $obj = $obj->noAccessFactory();
                     $obj->setSession($this->helper)
                         ->setParameters($parameters)
-                        ->setIwdb($this->db)
+                        ->setIwdb($iwdb)
                         ->setArgs($args);
                 }
 
 
-                $this->translator->setLang($this->locale->get());
-                $this->view->setTranslator($this->translator);
+                $this->translator->setLang($this->language);
+                $this->view->getEnvironment()->getExtension("iride_extensions")->setTranslator($this->translator);
                 $obj->setTwig($this->view)
                     ->setTranslator($this->translator)
                     ->setRequest($request)

@@ -42,13 +42,16 @@ class IWTranslator
             foreach ($files as $file) {
                 $extension = pathinfo($file)["extension"];
                 if($extension != "yml") continue;
-                $keys_file = \Spyc::YAMLLoad(file_get_contents($file));
+                $keys_file = \Spyc::YAMLLoad(file_get_contents(__DIR__."/../../../../../../config/dictionary/".$file));
                 $keys = array_merge($keys,$keys_file);
             }
             IWCache::set("dictionary",$keys);
         }
+        //print_r($keys);
         if(array_key_exists($key,$keys))
+        {
             return $keys[$key][$this->lang];
+        }
 
         return $key;
     }
