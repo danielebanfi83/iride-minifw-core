@@ -13,9 +13,11 @@ interface IWUsersInterface
 {
     public function getId();
 
-    public function getAttivo();
+    public function getActive();
 
     public function getUsername();
+
+    public function getLang();
 
     public function getAdmin();
 

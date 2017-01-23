@@ -135,7 +135,7 @@ abstract class DBTable implements \Iterator {
         if($key != "" && IWCache::have("getElencoPaginato_".$key)) return IWCache::get($key);
         $cols=$this->getObjectCols();
         $sql=$this->getSqlElenco($cols,$where,$orderby, $params);
-        list($rs,$righe_totali)=$this->getDb()->db_paging_query3($sql);
+        list($rs,$righe_totali)=$this->getDb()->db_paging_query($sql);
         $class = get_called_class();
         $rows=[];
         while($r=$this->getDb()->db_fetch_array($rs,1)){
@@ -231,26 +231,6 @@ abstract class DBTable implements \Iterator {
     public function rewind()
     {
         reset($this->columns);
-    }
-
-    /**
-     * @return Repository|null
-     */
-    public function getRepository(){
-        $dbtable = get_class($this);
-        $cache_identifier = str_replace("\\","",$dbtable);
-        if(IWCache::have("repo_".$cache_identifier)) return IWCache::get("repo_".$cache_identifier);
-        $pos = strpos($dbtable,"Entities") + 9;
-        $namespace = substr($dbtable,0,$pos)."Repository\\";
-        $class = $namespace.substr($dbtable,$pos)."Repository";
-        if(!class_exists($class)) return null;
-        /**
-         * @var $repo Repository
-         */
-        $repo = new $class();
-        $repo->setDbObject($this);
-        IWCache::set("repo_".$cache_identifier, $repo, 86400);
-        return $repo;
     }
 
     /**

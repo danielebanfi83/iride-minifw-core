@@ -10,6 +10,7 @@ namespace IrideWeb\Core;
 
 
 use Interop\Container\ContainerInterface;
+use IrideWeb\Database\IWDb;
 use IrideWeb\Twig\IrideTwigExtension;
 use Slim\App;
 use Slim\Csrf\Guard;
@@ -30,6 +31,11 @@ class IWKernel
      */
     protected $container;
 
+    /**
+     * @var IWDb
+     */
+    protected $iwdb;
+
     protected $settings;
 
     private $environment;
@@ -37,6 +43,7 @@ class IWKernel
     public function __construct($parameters)
     {
         $this->parameters = $parameters;
+        $this->iwdb = null;
     }
 
     public function setDependencies(){
@@ -58,23 +65,37 @@ class IWKernel
 
             return $view;
         };
+
+        if(!array_key_exists("db_parameters", $this->parameters)) return;
+
+        $db_params = $this->parameters["db_parameters"];
+        $this->iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
+        $iwdb = $this->iwdb;
+        $this->container["db"] = function () use ($db_params, $iwdb){
+            $iwdb->setDb($db_params["db_name"]);
+            $iwdb->DBOpen();
+            IWGlobal::setDbInstance($iwdb);
+            return $iwdb;
+        };
+
     }
 
     /**
      * Application Middleware
      */
     public function setMiddleware(){
+        //Session management
         $this->app->add(new \Slim\Middleware\Session([
             'name' => 'iwsession',
             'autorefresh' => true,
             'lifetime' => '8 hour',
             "csrf" => true
         ]));
-        // Register with container
         $this->container["helper"] = function (){
             return new Helper();
         };
 
+        //CSRF Protection
         $this->container['csrf'] = function () {
             $guard = new Guard();
             $guard->setFailureCallable(function ($request, $response, $next) {
@@ -85,9 +106,19 @@ class IWKernel
             return $guard;
         };
 
-        // Register middleware for all routes
-        // If you are implementing per-route checks you must not add this
         $this->app->add($this->container->get('csrf'));
+
+        $dictionary = $this->parameters["dictionary"];
+        $translator = $dictionary["class"];
+
+        /**
+         * @var $translator IWTranslator
+         */
+        $translator = new $translator();
+        $translator->setDb($this->iwdb);
+        $translator->setConfig($dictionary);
+        $this->container["translator"] = $translator;
+        $this->app->add(new LanguageMiddleware($translator->getAvailableLanguages(),$translator->getDefaultLanguage(),$this->container));
     }
 
     public function setRoutes(){
@@ -110,17 +141,22 @@ class IWKernel
                 $obj = IWController::factory($obj);
                 $obj->setSession($this->helper)
                     ->setParameters($parameters)
+                    ->setIwdb($this->db)
                     ->setArgs($args);
 
                 if(!$obj->checkPermission($role)) {
                     $obj = $obj->noAccessFactory();
                     $obj->setSession($this->helper)
                         ->setParameters($parameters)
+                        ->setIwdb($this->db)
                         ->setArgs($args);
                 }
 
 
+                $this->translator->setLang($this->locale->get());
+                $this->view->setTranslator($this->translator);
                 $obj->setTwig($this->view)
+                    ->setTranslator($this->translator)
                     ->setRequest($request)
                     ->setResponse($response)
                     ->setRole($role);

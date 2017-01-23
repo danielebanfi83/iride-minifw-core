@@ -165,12 +165,7 @@ function t($id,$no_ucwords=false){
 }
 
 function checkEmail($email){
-    $regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/';
-    if(getExtension($email)=="info") return true;
-    if(getExtension($email)=="coop") return true;
-	if(getExtension($email)=="name") return true;
-    if (preg_match($regex, $email)) return true;
-    else return false;
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
 function formSerialize($array){
@@ -225,16 +220,6 @@ function startsWith($search,$subject){
     return false;
 }
 
-/**
- * Funzione che contorlla se la stringa passata contenga e rimuova i due caratteri iniziali che ne indicano la nazionalità
- * @param $string
- * @return string
- */
-
-function pivaCharsRemover($string){
-	return preg_replace("/^\\D*/", "", $string);
-}
-
 function elencadir($dir,$array,$exclude_dirs=array()){
     if($directory = opendir($dir)){
         while(false !== ($file = readdir($directory))){
@@ -258,29 +243,6 @@ function iwautoload($class_name) {
         $path .= $path_to[$i]."/";
     }
     include_once(__DIR__."/../../../src/".$path.$path_to[count($path_to) - 1].".php");
-}
-
-function getNameSpaceFromContent($content){
-    $pos1 = strpos($content,"namespace") + 10;
-    $pos2 = strpos(substr($content,$pos1),";");
-    return trim(substr($content,$pos1,$pos2));
-}
-
-function getNameSpace($classname){
-    if(IWCache::get($classname."_namespace") != "") return IWCache::get($classname."_namespace");
-    $ar = [];
-    $exclude_dirs = array("", ".", "..");
-    $ar_dir=elencadir(__DIR__."/../../src",$ar,$exclude_dirs);
-    $content = "";
-    foreach ($ar_dir as $dir) {
-        if(!file_exists($dir."/".$classname.".php")) continue;
-
-        $content = file_get_contents($dir."/".$classname.".php");
-        break;
-    }
-    $fullyQ = getNameSpaceFromContent($content);
-    IWCache::set($classname."_namespace", $fullyQ, 604800);
-    return $fullyQ;
 }
 
 function IWSelect(){

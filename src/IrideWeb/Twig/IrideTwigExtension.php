@@ -9,12 +9,18 @@
 namespace IrideWeb\Twig;
 
 use IrideWeb\Core\Date;
+use IrideWeb\Core\IWTranslator;
 use Slim\Views\TwigExtension;
 use Twig_SimpleFunction;
 
 class IrideTwigExtension extends TwigExtension
 {
     protected $environment;
+
+    /**
+     * @var IWTranslator
+     */
+    protected $translator;
 
     /**
      * Returns the name of the extension.
@@ -31,11 +37,11 @@ class IrideTwigExtension extends TwigExtension
         $func = parent::getFunctions();
         $func_iride = [
             new Twig_SimpleFunction("getmicrotime",function(){ return getmicrotime(); }),
-            new Twig_SimpleFunction("t", function($word){ return t($word); }),
             new Twig_SimpleFunction("toEuro", function($number, $decimals = 2, $se_zero_stringa_vuota = false){ return toEuro($number, $decimals, $se_zero_stringa_vuota); }),
             new Twig_SimpleFunction("date_it", function($data){ return Date::it($data); }),
             new Twig_SimpleFunction("getCsrfForm", [$this, "getCsrfForm"],["is_safe" => ["all"], "needs_environment" => true]),
-            new Twig_SimpleFunction("path",[$this, "path"])
+            new Twig_SimpleFunction("path",[$this, "path"]),
+            new Twig_SimpleFunction("trans",[$this, "trans"], ["needs_environment" => true])
         ];
         
         return array_merge($func, $func_iride);
@@ -54,6 +60,10 @@ class IrideTwigExtension extends TwigExtension
         return $this->environment == "dev" ? "/dev.php".$route : $route;
     }
 
+    public function trans($key){
+        return $this->translator->trans($key);
+    }
+
     /**
      * @return mixed
      */
@@ -69,6 +79,25 @@ class IrideTwigExtension extends TwigExtension
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
+
+        return $this;
+    }
+
+    /**
+     * @return IWTranslator
+     */
+    public function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+     * @param IWTranslator $translator
+     * @return IrideTwigExtension
+     */
+    public function setTranslator($translator)
+    {
+        $this->translator = $translator;
 
         return $this;
     }

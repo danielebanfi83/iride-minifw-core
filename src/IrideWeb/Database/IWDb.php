@@ -36,6 +36,25 @@ class IWDb{
 		$this->DBConnect();
 	}
 
+    /**
+     * @return mixed
+     */
+    public function getDb()
+    {
+        return $this->db;
+    }
+
+    /**
+     * @param mixed $db
+     * @return IWDb
+     */
+    public function setDb($db)
+    {
+        $this->db = $db;
+
+        return $this;
+    }
+
 	/**
 	 * @return PDO
 	 */
@@ -164,10 +183,9 @@ class IWDb{
 //se codcliente=="" prende il cliente che ha fatto il IWLogin
 	public function DBOpen()
 	{
-        $db = $this->session->get("db");//IWSession::r("db");
         try{
             $this->db_connect();
-            $this->DBUse($db);
+            $this->DBUse();
         }
         catch(PDOException $e){
             die($e->getMessage());
@@ -177,11 +195,10 @@ class IWDb{
 	}
 
 //usa il db passato nei parametri. Se non è passato nulla apre il db di sessione
-	public function DBUse($db="")
+	public function DBUse()
 	{
-		$this->db = $db == "" ? $this->session->get("db")/*IWSession::r("db")*/ : $db;
         try{
-            $this->pdo->exec("USE ".$db);
+            $this->pdo->exec("USE ".$this->db);
         }
         catch(PDOException $e){
             die($e->getMessage());

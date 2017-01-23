@@ -64,6 +64,11 @@ abstract class IWController
      * @var array
      */
     protected $parameters;
+
+    /**
+     * @var IWTranslator
+     */
+    protected $translator;
     
     public static function factory($object){
         $parameters = IWGlobal::get("config");
@@ -118,17 +123,24 @@ abstract class IWController
             $this->modules[] = $module["name"];
         }
 
-        $db_params = $this->parameters["db_parameters"];
-        $this->iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
-        $this->session->set("db",$db_params["dbname"]);
-        $this->iwdb->setModules($this->modules);
-        $this->iwdb->setSession($this->session);
-        $this->iwdb->DBOpen();
-        IWGlobal::setDbInstance($this->iwdb);
-
         $pwds = $this->parameters["pwd_passepartout"];
         IWGlobal::set("pwd1", $pwds["pwd1"]);
         IWGlobal::set("pwd2", $pwds["pwd2"]);
+
+        return $this;
+    }
+
+    /**
+     * @param IWDb $iwdb
+     * @return IWController
+     */
+    public function setIwdb($iwdb)
+    {
+        $this->iwdb = $iwdb;
+        if($this->iwdb !== null){
+            $this->iwdb->setModules($this->modules);
+            $this->iwdb->setSession($this->session);
+        }
 
         return $this;
     }
@@ -364,5 +376,24 @@ abstract class IWController
     public function getParameters()
     {
         return $this->parameters;
+    }
+
+    /**
+     * @return IWTranslator
+     */
+    public function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+     * @param IWTranslator $translator
+     * @return IWController
+     */
+    public function setTranslator($translator)
+    {
+        $this->translator = $translator;
+
+        return $this;
     }
 }
