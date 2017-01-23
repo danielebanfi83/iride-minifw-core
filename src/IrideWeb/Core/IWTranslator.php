@@ -47,11 +47,8 @@ class IWTranslator
             }
             IWCache::set("dictionary",$keys);
         }
-        //print_r($keys);
         if(array_key_exists($key,$keys))
-        {
             return $keys[$key][$this->lang];
-        }
 
         return $key;
     }
