@@ -42,8 +42,10 @@ class IWCacheGlobal implements IWCacheInterface
 	{
 		if($chiave=="") return false;
         $arr=IWGlobal::get("cache");
-        //echo "chiave: ".$chiave."\n";print_r($arr);echo "\n\n";
-        if(!is_array($arr)) $this->init();
+        if(!is_array($arr)) {
+        	$this->init();
+        	$arr = [];
+        }
         return array_key_exists($chiave,$arr);
 	}
 }
