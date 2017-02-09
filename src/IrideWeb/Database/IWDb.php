@@ -61,6 +61,7 @@ class IWDb{
 	private function db_connect()
 	{
 		$this->pdo = new PDO("mysql:host=".$this->host.";charset=utf8",$this->user,$this->pwd);
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $this->pdo;
 	}
 
@@ -69,21 +70,24 @@ class IWDb{
     }
 
 	/**
-	 * @param IWQuery $sql
+	 * @param string|IWQuery $sql
 	 * @return bool|PDOStatement
 	 */
 	public function db_query($sql)
 	{
         $sth = $this->pdo->prepare($sql);
-        $params = $sql->getParams();
-        foreach ($params as $param => $values) {
-            $value = $values[0];
-            $type = $values[1] == "int" ? PDO::PARAM_INT : PDO::PARAM_STR;
-            //if(strtoupper($value) == "NULL")
-              //  $type = PDO::PARAM_NULL;
+        if($sql instanceof IWQuery){
+            $params = $sql->getParams();
+            foreach ($params as $param => $values) {
+                $value = $values[0];
+                $type = $values[1] == "int" ? PDO::PARAM_INT : PDO::PARAM_STR;
+                //if(strtoupper($value) == "NULL")
+                //  $type = PDO::PARAM_NULL;
 
-            $sth->bindValue(":".$param, $value, $type);
+                $sth->bindValue(":".$param, $value, $type);
+            }
         }
+
         $sth->execute();
         return $sth;
 	}
@@ -207,7 +211,7 @@ class IWDb{
 
     /**
      * Metodo che esegue una query di inserimento/modifica/cancellazione
-     * @param IWQuery $sql
+     * @param string|IWQuery $sql
      * @return bool|PDOStatement
      */
 	public function DBExec($sql)

@@ -42,29 +42,37 @@ class IWUpdateSchemaDb extends IWCommand
             if (!($entity instanceof DBTable)) continue;
             $entity->setColumns();
             $entities[] = $entity;
-            $sql = "CREATE TABLE " . $entity->getTable() . " (id int(11) NOT NULL auto_increment,PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
             try {
+                $sql = "CREATE TABLE " . $entity->getTable() . " (id int(11) NOT NULL auto_increment,PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
                 $ret = $this->getDb()->DBExec($sql);
-                $fk = 1;
-                foreach ($entity as $column) {
-                    $size = strtoupper($column->getType()) == "TEXT" || strtoupper($column->getType()) == "LONGTEXT" ? "" : "(" . $column->getSize() . ")";
-
-                    if (is_numeric($column->getDefault()) || $column->getDefault() == "NULL") $default = $column->getDefault();
-                    else $default = $column->getDefault() == "" ? $default = "''" : "'" . $column->getDefault() . "'";
-
-                    $sql = "ALTER TABLE " . $entity->getTable() . " ADD COLUMN " . $column->getName() . " " . strtoupper($column->getType()) . $size . " DEFAULT " . $default . " COMMENT '" . addslashes($column->getComment()) . "'";
-                    $this->getDb()->DBExec($sql);
-
-                    if (empty($column->getForeignKey())) continue;
-
-                    $foreign_keys[] = ["fk" => $column->getForeignKey(), "entity" => $entity, "column" => $column->getName(), "n" => $fk];
-                    $fk++;
-                }
-                $entity->insertDefaultRecords();
             }
             catch (\PDOException $e){
                 echo $e->getMessage()."\n";
             }
+            $fk = 1;
+            foreach ($entity as $column) {
+                $size = strtoupper($column->getType()) == "TEXT" || strtoupper($column->getType()) == "LONGTEXT" ? "" : "(" . $column->getSize() . ")";
+
+                if (is_numeric($column->getDefault()) || $column->getDefault() == "NULL") $default = $column->getDefault();
+                else $default = $column->getDefault() == "" ? $default = "''" : "'" . $column->getDefault() . "'";
+
+                try{
+                    $sql = "ALTER TABLE " . $entity->getTable() . " ADD COLUMN " . $column->getName() . " " . strtoupper($column->getType()) . $size . " DEFAULT " . $default . " COMMENT '" . addslashes($column->getComment()) . "'";
+                    echo $sql."\n";
+                    $this->getDb()->DBExec($sql);
+                }
+                catch (\PDOException $e){
+                    echo $e->getMessage()."\n";
+                }
+
+                if (empty($column->getForeignKey())) continue;
+
+                $foreign_keys[] = ["fk" => $column->getForeignKey(), "entity" => $entity, "column" => $column->getName(), "n" => $fk];
+                $fk++;
+            }
+            $entity->insertDefaultRecords();
+
+
         }
         return array("Rigenera Db: ".$i." tabelle rigenerate", $foreign_keys);
     }
@@ -81,8 +89,13 @@ class IWUpdateSchemaDb extends IWCommand
             $colname = $ar_fk["column"];
             $fk = $ar_fk["n"];
 
-            $sql = "ALTER TABLE ".$entity->getTable()." ADD CONSTRAINT `".$entity->getTable()."_ibfk_".$fk."` FOREIGN KEY (`".$colname."`) REFERENCES `".$foreignKey["table"]."` (`id`) ON DELETE ".strtoupper($foreignKey["on_delete"])." ON UPDATE ".strtoupper($foreignKey["on_update"]);
-            $this->getDb()->DBExec($sql);
+            try{
+                $sql = "ALTER TABLE ".$entity->getTable()." ADD CONSTRAINT `".$entity->getTable()."_ibfk_".$fk."` FOREIGN KEY (`".$colname."`) REFERENCES `".$foreignKey["table"]."` (`id`) ON DELETE ".strtoupper($foreignKey["on_delete"])." ON UPDATE ".strtoupper($foreignKey["on_update"]);
+                $this->getDb()->DBExec($sql);
+            }
+            catch (\PDOException $e){
+                echo $e->getMessage()."\n";
+            }
             $i++;
         }
 
