@@ -24,8 +24,9 @@ abstract class IWCommand
 
         $parameters = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/config.yml");
         $db_params = $parameters["db_parameters"];
-        //print_r($db_params);die();
         $iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
+        $iwdb->setDb($db_params["dbname"]);
+        $iwdb->DBUse();
         IWGlobal::setDbInstance($iwdb);
         
         $my_command = $args[0];
