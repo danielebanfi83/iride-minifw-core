@@ -20,6 +20,15 @@ abstract class DBTable implements \Iterator {
 
     abstract public function setColumns();
 
+    public function __construct($id = 0, $r = [])
+    {
+        $this->setFields($this->defineTable(),$id,$r);
+    }
+
+    public function defineTable(){
+        return "";
+    }
+
     protected function setFields($table,$id,$r){
         $this->table = $table;
         $this->id = intval($id);
@@ -47,6 +56,10 @@ abstract class DBTable implements \Iterator {
 
     public function getDb(){
         return IWGlobal::getDbInstance();
+    }
+
+    public function findOneBy($criteria){
+        $this->__construct($this->getDb()->DBReadFirst(IWSelect()->addField("id")->setTable($this->table)->addWhere(implodeArrayWithKeys($criteria, "' AND ", "='")."'")));
     }
 
     public function clearCacheObject(){

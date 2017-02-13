@@ -220,6 +220,20 @@ function startsWith($search,$subject){
     return false;
 }
 
+function implodeArrayWithKeys($input, $stringImplode = "&", $stringSeparator = "="){
+    return implode($stringImplode, array_map(
+        function ($v, $k) use($stringSeparator) {
+            if(is_array($v)){
+                return $k.'[]'.$stringSeparator.implode('&'.$k.'[]'.$stringSeparator, $v);
+            }else{
+                return $k.$stringSeparator.$v;
+            }
+        },
+        $input,
+        array_keys($input)
+    ));
+}
+
 function elencadir($dir,$array,$exclude_dirs=array()){
     if($directory = opendir($dir)){
         while(false !== ($file = readdir($directory))){
