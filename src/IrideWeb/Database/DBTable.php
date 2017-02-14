@@ -59,7 +59,12 @@ abstract class DBTable implements \Iterator {
     }
 
     public function findOneBy($criteria){
-        $this->__construct($this->getDb()->DBReadFirst(IWSelect()->addField("id")->setTable($this->table)->addWhere(implodeArrayWithKeys($criteria, "' AND ", "='")."'")));
+        $keys = array_keys($criteria);
+        $sql = IWSelect()->addField("id")->setTable($this->table)->addWhere(implode(" AND ", array_map(function($v){return $v." = :".$v;},$keys)));
+        foreach ($criteria as $param => $value) {
+            $sql->bindParam($param, $value);
+        }
+        $this->__construct($this->getDb()->DBReadFirst($sql));
     }
 
     public function clearCacheObject(){
