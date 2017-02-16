@@ -55,7 +55,7 @@ abstract class IWCommand
     }
 
     /**
-     * @param mixed $iwdb
+     * @param IWDb $iwdb
      * @return IWCommand
      */
     public function setIwdb($iwdb)
@@ -75,7 +75,10 @@ abstract class IWCommand
 
         return $this;
     }
-    
+
+    /**
+     * @return IWDb
+     */
     public function getDb(){
         return $this->iwdb;
     }
