@@ -27,6 +27,11 @@ abstract class IWCommand
         $iwdb = new IWDb($db_params["dbhost"],$db_params["dbuser"],$db_params["dbpwd"]);
         $iwdb->setDb($db_params["dbname"]);
         $iwdb->DBUse();
+        $modules = [];
+        foreach ($parameters["modules"] as $module) {
+            $modules[] = $module["name"];
+        }
+        $iwdb->setModules($modules);
         IWGlobal::setDbInstance($iwdb);
         
         $my_command = $args[0];
