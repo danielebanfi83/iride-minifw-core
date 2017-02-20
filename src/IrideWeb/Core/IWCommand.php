@@ -18,6 +18,8 @@ abstract class IWCommand
     
     private $iwdb;
     
+    protected $parameters;
+    
     abstract public function execute();
     
     public static function run($args){
@@ -54,6 +56,7 @@ abstract class IWCommand
             die();
         }
         
+        $obj->setParameters($parameters);
         $obj->setArgs($args);
         $obj->setIwdb($iwdb);
         $obj->execute();
@@ -86,5 +89,24 @@ abstract class IWCommand
      */
     public function getDb(){
         return $this->iwdb;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param mixed $parameters
+     * @return IWCommand
+     */
+    public function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
+
+        return $this;
     }
 }
