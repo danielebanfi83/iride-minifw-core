@@ -75,6 +75,8 @@ abstract class IWController
      */
     protected $user;
     
+    private $filename;
+    
     public static function factory($object){
         $parameters = IWGlobal::get("config");
         if(!array_key_exists("factory", $parameters)) $index = new IWIndex();
@@ -199,11 +201,20 @@ abstract class IWController
             case "json" :
                  $response = $this->response->withJson($this->getTotalContext()); break;
             case "xml":
-                $response = $this->response->getBody()->write(generaXML($this->getTotalContext())); break;
+                $this->response = $this->response->withHeader("Content-Disposition","attachment; filename=\"stream.xml\"");
+                $this->response->getBody()->write(generaXML($this->getTotalContext())); 
+                $response = $this->response;
+                break;
             case "twig":
                 $response = $this->twig->render($this->response, $this->getTwigPage(), $this->getTotalContext()); break;
+            case "file":
+                $this->response = $this->response->withHeader("Content-Type", "application/".getExtension($this->filename));
+                $this->response = $this->response->withAddedHeader("Content-Disposition", "attachment; filename=\"".$this->filename."\"");
+                $response = $this->response;
+                break;
             default:
-                $response = $this->response->getBody()->write($this->getTotalContext()); break;
+                $this->response->getBody()->write($this->getTotalContext());
+                $response = $this->response;
                 break;
         }
         return $response;
@@ -221,6 +232,10 @@ abstract class IWController
         }
 
         return $this->getContext();
+    }
+    
+    public function setFilename($filename){
+        $this->filename = $filename;
     }
 
     private function saveInDb(){
