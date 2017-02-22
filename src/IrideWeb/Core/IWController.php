@@ -74,7 +74,15 @@ abstract class IWController
      * @var IWUsersInterface
      */
     protected $user;
-    
+
+    /**
+     * @var bool
+     */
+    protected $no_csrf_protection = false;
+
+    /**
+     * @var string
+     */
     private $filename;
     
     public static function factory($object){
@@ -210,6 +218,7 @@ abstract class IWController
             case "file":
                 $this->response = $this->response->withHeader("Content-Type", "application/".getExtension($this->filename));
                 $this->response = $this->response->withAddedHeader("Content-Disposition", "attachment; filename=\"".$this->filename."\"");
+                $this->response->getBody()->write($this->getTotalContext());
                 $response = $this->response;
                 break;
             default:
@@ -221,7 +230,7 @@ abstract class IWController
     }
     
     private function getTotalContext(){
-        if($this->request->getAttribute("csrf_result") == "FAILED") return["csrf_result" => "FAILED"];
+        if($this->request->getAttribute("csrf_result") == "FAILED" && !$this->no_csrf_protection) return["csrf_result" => "FAILED"];
         if($this->responseFormat == "json" && intval($this->request->getParsedBody()["OP_FROM_AJAX"]) == 1){
             unset($this->args["is_admin"], $this->args["is_superadmin"], $this->args["is_supersuperadmin"]);
             return array_merge($this->args,$this->saveInDb());
