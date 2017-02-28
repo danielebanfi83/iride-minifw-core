@@ -23,6 +23,10 @@ class IWCacheGlobal implements IWCacheInterface
 	public function un_set($chiave)
 	{
 		$arr=IWGlobal::get("cache");
+        if(!is_array($arr)) {
+            $this->init();
+            $arr = [];
+        }
 		if(array_key_exists($chiave,$arr)) unset($arr[$chiave]);
 		IWGlobal::set("cache",$arr);
         return true;
