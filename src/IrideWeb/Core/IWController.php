@@ -204,7 +204,10 @@ abstract class IWController
         }
 
         $this->responseFormat = $this->getResponseFormat();
-        if(intval($this->request->getParsedBody()["OP_FROM_AJAX"]) == 1) $this->responseFormat = "json";
+
+        if($this->request->getParsedBody()!==null)
+            if(array_key_exists("OP_FROM_AJAX",$this->request->getParsedBody()))
+                if(intval($this->request->getParsedBody()["OP_FROM_AJAX"]) == 1) $this->responseFormat = "json";
         switch($this->responseFormat){
             case "json" :
                  $response = $this->response->withJson($this->getTotalContext()); break;
