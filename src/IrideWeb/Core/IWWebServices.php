@@ -21,7 +21,7 @@ abstract class IWWebServices extends IWController
     public function getResponseFormat()
     {
         $token = $this->request->getMethod() == "GET" ? $this->args["token"] : $this->request->getParsedBody()["token"];
-        if($this->request->getMethod() == "POST") $this->no_csrf_protection = true;
+        $this->no_csrf_protection = true;
 
         if($token != $this->parameters["webservice"]["token"]){
             $this->token_not_valid = true;
@@ -38,18 +38,9 @@ abstract class IWWebServices extends IWController
             return "";
         }
 
-        return $this->wsContext();
-    }
-    
-    public function run()
-    {
-        $response = parent::run();
-
-        if($this->responseFormat == "json"){
-            unset($response["token"]);
-            if(!$this->no_csrf_protection) unset($response["csrfNameKey"], $response["csrfValueKey"], $response["csrfName"], $response["csrfValue"]);
-        }
-
-        return $response;
+        $ret = $this->wsContext();
+        if($this->request->getMethod() == "GET") unset($this->args["token"]);
+        
+        return $ret;
     }
 }
