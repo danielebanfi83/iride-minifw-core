@@ -38,11 +38,18 @@ abstract class IWWebServices extends IWController
             return "";
         }
 
-        $ret = $this->wsContext();
+        return $this->wsContext();
+    }
+    
+    public function run()
+    {
+        $response = parent::run();
 
-        unset($ret["token"]);
-        if(!$this->no_csrf_protection) unset($ret["csrfNameKey"], $ret["csrfValueKey"], $ret["csrfName"], $ret["csrfValue"]);
-        
-        return $ret;
+        if($this->responseFormat == "json"){
+            unset($response["token"]);
+            if(!$this->no_csrf_protection) unset($response["csrfNameKey"], $response["csrfValueKey"], $response["csrfName"], $response["csrfValue"]);
+        }
+
+        return $response;
     }
 }
