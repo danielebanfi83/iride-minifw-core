@@ -40,7 +40,21 @@ abstract class IWWebServices extends IWController
 
         $ret = $this->wsContext();
         if($this->request->getMethod() == "GET") unset($this->args["token"]);
-        
+
         return $ret;
+    }
+
+    public function run()
+    {
+        $response = parent::run();
+        if($this->responseFormat == "json"){
+            $context = json_decode($response->getBody(),true);
+            unset($context["token"]);
+            if(array_key_exists("csrfNameKey", $context))
+                unset($context["csrfNameKey"], $context["csrfValueKey"], $context["csrfName"], $context["csrfValue"]);
+            $response = $this->response->withJson($context);
+        }
+
+        return $response;
     }
 }
