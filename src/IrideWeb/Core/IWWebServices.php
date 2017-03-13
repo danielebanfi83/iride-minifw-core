@@ -38,6 +38,11 @@ abstract class IWWebServices extends IWController
             return "";
         }
 
-        return $this->wsContext();
+        $ret = $this->wsContext();
+
+        unset($ret["token"]);
+        if(!$this->no_csrf_protection) unset($ret["csrfNameKey"], $ret["csrfValueKey"], $ret["csrfName"], $ret["csrfValue"]);
+        
+        return $ret;
     }
 }
