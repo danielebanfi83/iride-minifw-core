@@ -58,13 +58,13 @@ abstract class DBTable implements \Iterator {
         return IWGlobal::getDbInstance();
     }
 
-    public function findOneBy($criteria){
+    public function findOneBy($criteria, $use_cache = false){
         $keys = array_keys($criteria);
         $sql = IWSelect()->addField("id")->setTable($this->table)->addWhere(implode(" AND ", array_map(function($v){return $v." = :".$v;},$keys)));
         foreach ($criteria as $param => $value) {
             $sql->bindParam($param, $value);
         }
-        $this->__construct($this->getDb()->DBReadFirst($sql));
+        $this->__construct($this->getDb()->DBReadFirst($sql, $use_cache));
     }
 
     public function clearCacheObject(){
