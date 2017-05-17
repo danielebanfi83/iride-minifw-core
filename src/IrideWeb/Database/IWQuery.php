@@ -100,6 +100,17 @@ class IWQuery {
         array_push($this->wheres,$where);
         return $this;
     }
+    
+    public function addWhereIn($where, $values, $placeholder = "placeholder", $type = "string"){
+        $placeholders = $values;
+        array_walk($placeholders,function(&$item, $key, $string){ $item = $string.$key; },":".$placeholder);
+        $this->addWhere($where." (".implode(", ",$placeholders).")");
+        foreach ($values as $i => $val) {
+            $this->bindParam($placeholder.$i, $val, $type);
+        }
+
+        return $this;
+    }
 
     public function addWhereIds($column,$value,$operator="AND"){
         $where=$operator."( ";
