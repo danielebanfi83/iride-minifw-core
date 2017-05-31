@@ -281,3 +281,11 @@ function getmicrotime()
     list($usec, $sec) = explode(" ",microtime());
     return ((float)$usec + (float)$sec);
 }
+
+function str_putcsv($filename, $input, $delimiter = ',', $enclosure = '"') {
+    $fp = fopen($filename, 'w');
+    foreach ($input as $row) {
+        fputcsv($fp, $row, $delimiter, $enclosure);
+    }
+    fclose($fp);
+}
