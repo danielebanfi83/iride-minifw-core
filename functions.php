@@ -175,11 +175,7 @@ function formSerialize($array){
 }
 
 function iwPad($input,$length,$pad_string=" ",$type=STR_PAD_LEFT){
-    $l1=strlen($input);
-    $l2=strlen(utf8_decode($input));
-    $diff=$l1-$l2;
-    if($diff>0) $length+=$diff;
-    $input=substr(trim($input),0,$length);
+    $input = mb_substr(trim($input),0,$length,"UTF-8");
     return str_pad($input,$length,$pad_string,$type);
 }
 
