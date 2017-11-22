@@ -234,9 +234,11 @@ abstract class IWController
     
     private function getTotalContext(){
         if($this->request->getAttribute("csrf_result") == "FAILED" && !$this->no_csrf_protection) return["csrf_result" => "FAILED"];
-        if($this->responseFormat == "json" && intval($this->request->getParsedBody()["OP_FROM_AJAX"]) == 1){
-            unset($this->args["is_admin"], $this->args["is_superadmin"], $this->args["is_supersuperadmin"]);
-            return array_merge($this->args,$this->saveInDb());
+        if(array_key_exists("OP_FROM_AJAX", $this->request->getParsedBody())){
+            if($this->responseFormat == "json" && intval($this->request->getParsedBody()["OP_FROM_AJAX"]) == 1){
+                unset($this->args["is_admin"], $this->args["is_superadmin"], $this->args["is_supersuperadmin"]);
+                return array_merge($this->args,$this->saveInDb());
+            }    
         }
         if(in_array($this->responseFormat, ["json","xml","twig"]))
         {
