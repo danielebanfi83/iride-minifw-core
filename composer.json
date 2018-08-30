@@ -4,6 +4,7 @@
     "require": {
     	"php": ">=5.5.0",
         "slim/twig-view": "^2.1",
+        "slim/php-view": "^2.2",
         "tecnickcom/tcpdf": "^6.2",
         "phpoffice/phpspreadsheet": "^1.1",
         "swiftmailer/swiftmailer": "^5.4",
