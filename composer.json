@@ -7,7 +7,9 @@
         "tecnickcom/tcpdf": "^6.2",
         "phpoffice/phpspreadsheet": "^1.1",
         "swiftmailer/swiftmailer": "^5.4",
-        "luism-s/multilingualslim": "dev-master"
+        "luism-s/multilingualslim": "dev-master",
+        "monolog/monolog": "^1.23",
+        "chadicus/slim-oauth2": "^3.1"
     },
     "license": "MIT",
     "authors": [
