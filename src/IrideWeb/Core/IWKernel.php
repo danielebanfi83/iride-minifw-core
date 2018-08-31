@@ -12,6 +12,7 @@ namespace IrideWeb\Core;
 use Interop\Container\ContainerInterface;
 use IrideWeb\Database\IWDb;
 use IrideWeb\Database\IWQuery;
+use IrideWeb\Oauth2\IWOauth2;
 use IrideWeb\Twig\IrideTwigExtension;
 use MultilingualSlim\LanguageMiddleware;
 use Slim\App;
@@ -192,6 +193,8 @@ class IWKernel
      */
     public static function factory(){
         $parameters = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/config.yml");
+        $request_uri = str_replace("/dev.php","",$_SERVER["REQUEST_URI"]);
+        if(startsWith("/api",$request_uri)) return new \IrideWeb\Oauth2\IWOauth2($parameters);
 
         if(!array_key_exists("factory", $parameters)) return new IWKernel($parameters);
 
