@@ -6,7 +6,7 @@
  * Time: 11.50
  */
 
-namespace IrideWeb\Oauth2\Middlewares;
+namespace IrideWeb\OAuth2\Middlewares;
 
 
 

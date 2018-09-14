@@ -6,7 +6,7 @@
  * Time: 9.20
  */
 
-namespace IrideWeb\Oauth2\Exceptions;
+namespace IrideWeb\OAuth2\Exceptions;
 
 use IrideWeb\OAuth2\Base\IWRestResponse;
 use Slim\Http\Request;

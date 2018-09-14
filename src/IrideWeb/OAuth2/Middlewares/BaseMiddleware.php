@@ -6,7 +6,7 @@
  * Time: 10.38
  */
 
-namespace IrideWeb\Oauth2\Middlewares;
+namespace IrideWeb\OAuth2\Middlewares;
 use Slim\Container;
 
 class BaseMiddleware
