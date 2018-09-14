@@ -194,7 +194,7 @@ class IWKernel
     public static function factory(){
         $parameters = \Spyc::YAMLLoad(__DIR__."/../../../../../../config/config.yml");
         $request_uri = str_replace("/dev.php","",$_SERVER["REQUEST_URI"]);
-        if(startsWith("/api",$request_uri)) return new \IrideWeb\Oauth2\IWOauth2($parameters);
+        if(startsWith("/api",$request_uri)) return new IWOauth2($parameters);
 
         if(!array_key_exists("factory", $parameters)) return new IWKernel($parameters);
 
