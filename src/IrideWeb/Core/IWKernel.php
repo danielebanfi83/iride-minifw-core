@@ -12,7 +12,7 @@ namespace IrideWeb\Core;
 use Interop\Container\ContainerInterface;
 use IrideWeb\Database\IWDb;
 use IrideWeb\Database\IWQuery;
-use IrideWeb\Oauth2\IWOauth2;
+use IrideWeb\OAuth2\IWOauth2;
 use IrideWeb\Twig\IrideTwigExtension;
 use MultilingualSlim\LanguageMiddleware;
 use Slim\App;
