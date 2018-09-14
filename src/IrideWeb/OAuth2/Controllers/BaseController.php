@@ -6,7 +6,7 @@
  * Time: 10.19
  */
 
-namespace IrideWeb\Oauth2\Controllers;
+namespace IrideWeb\OAuth2\Controllers;
 use Slim\Container;
 
 class BaseController

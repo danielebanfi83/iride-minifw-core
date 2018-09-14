@@ -16,7 +16,7 @@ use IrideWeb\OAuth2\Base\IWRestResponse;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class OAuthInitMiddleware extends BaseMiddleware
+class c extends BaseMiddleware
 {
 
 	public function __invoke(Request $request, Response $response, callable $next)

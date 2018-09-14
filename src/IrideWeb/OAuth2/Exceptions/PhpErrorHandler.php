@@ -9,7 +9,7 @@
 namespace IrideWeb\Oauth2\Exceptions;
 
 
-use IrideWeb\OAuth2\Base\IWRestResponse
+use IrideWeb\OAuth2\Base\IWRestResponse;
 use Slim\Http\Request;
 use Slim\Http\Response;
 

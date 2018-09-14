@@ -17,10 +17,10 @@ use OAuth2\GrantType\AuthorizationCode;
 use Chadicus\Slim\OAuth2\Routes\Authorize;
 use Chadicus\Slim\OAuth2\Routes\Token;
 use Chadicus\Slim\OAuth2\Routes\ReceiveCode;
-use IrideWeb\Oauth2\Exceptions\ErrorHandler;
-use IrideWeb\Oauth2\Exceptions\NotFoundHandler;
-use IrideWeb\Oauth2\Exceptions\NotAllowedHandler;
-use IrideWeb\Oauth2\Exceptions\PhpErrorHandler;
+use IrideWeb\OAuth2\Exceptions\ErrorHandler;
+use IrideWeb\OAuth2\Exceptions\NotFoundHandler;
+use IrideWeb\OAuth2\Exceptions\NotAllowedHandler;
+use IrideWeb\OAuth2\Exceptions\PhpErrorHandler;
 use Chadicus\Slim\OAuth2\Middleware\Authorization;
 
 class IWOauth2 extends IWKernel
@@ -129,8 +129,8 @@ class IWOauth2 extends IWKernel
 
     public function setMiddleware()
     {
-        $this->app->add(new \IrideWeb\Oauth2\Middlewares\OAuthInitMiddleware($this->container));
-        $this->app->add(new \IrideWeb\Oauth2\Middlewares\ParseResponseMiddleware($this->container));
+        $this->app->add(new \IrideWeb\OAuth2\Middlewares\OAuthInitMiddleware($this->container));
+        $this->app->add(new \IrideWeb\OAuth2\Middlewares\ParseResponseMiddleware($this->container));
     }
 
     public function setRoutes()
