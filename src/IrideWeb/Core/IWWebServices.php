@@ -53,7 +53,7 @@ abstract class IWWebServices extends IWController
             if(array_key_exists("csrfNameKey", $context))
                 unset($context["csrfNameKey"], $context["csrfValueKey"], $context["csrfName"], $context["csrfValue"]);
             $context = $this->unsetOtherVars($context);
-            $response = $this->response->withJson($context, JSON_FORCE_OBJECT);
+            $response = $this->response->withJson($context, null, JSON_FORCE_OBJECT);
         }
 
         return $response;
